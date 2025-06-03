@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic Video with Text Overlays</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .video-container {
+            position:relative;
+           justify-content: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+
+        video {
+            width: 100%;
+            max-width: 400px;
+            height:auto;
+            border-radius: 10px;
+        }
+
+        .dynamic-content {
+            position: absolute;
+            display: none;
+            user-select: none;
+            margin: 0;
+           opacity:1;
+            transition:opacity 0.5s ease-in-out;
+        }
+        .dynamic-img{
+            position:absolute;
+            display:none;
+            user-select:none;
+            margin:0;
+          opacity:1;
+            transition:opacity 0.5s ease-in-out;
+         }
+    </style>
+</head>
+<body>
+    <div class="video-container">
+        <video id="video" width="400" controls controlsList="nodownload nofullscreen noplaybackrate noremoteplayback" disablePictureInPicture >
+            <source src="vid.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+        <audio id="audio">
+            <source id="audioScore" src="{{audio_url}}" type="audio/mp3">
+            Your browser does not support the audio tag.
+        </audio>
+ 
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const video = document.getElementById('video');
+            const audio = document.getElementById('audio');
+            const audioScore = document.getElementById('audioScore');
+            const videoContainer = document.querySelector('.video-container');
+
+            let textElements = [];
+            let imgElements= [];
+            
+
+           
+            function displayText(text, startTime, endTime, position, fontSize, fontColor, textAlign = 'left', fontWeight = 'normal', width = 'auto') {
+                const textDiv = document.createElement('div');
+                textDiv.classList.add('dynamic-content');
+                textDiv.textContent = text;
+                textDiv.style.fontSize = fontSize;
+                textDiv.style.color = fontColor;
+                textDiv.style.left = position.x + '%';
+                textDiv.style.top = position.y + '%';
+                textDiv.style.fontWeight = fontWeight;
+                textDiv.style.textAlign = textAlign;
+                textDiv.style.width = width;
+                textDiv.style.whiteSpace = 'pre-line';
+                textDiv.style.display = 'none';
+
+                videoContainer.appendChild(textDiv);
+
+                textElements.push({ div: textDiv, start: startTime, end: endTime });
+            }
+
+            function displayImage(src,startTime,endTime,position,width,height){
+                const img=document.createElement('img');
+                img.classList.add('dynamic-img');
+                img.src=src;
+                img.style.width=width;
+                img.style.height=height;
+                img.style.left=position.x+'%';
+                img.style.top=position.y+'%';
+                img.style.display='none';
+
+                videoContainer.appendChild(img);
+                imgElements.push({div:img,start:startTime,end:endTime});
+
+            }
+
+           
+            function updateTextVisibility(currentTime) {
+                textElements.forEach(function(text) {
+                    if (currentTime >= text.start && currentTime < text.end) {
+                        text.div.style.display = 'block';
+                    } else {
+                        text.div.style.display = 'none';
+                    }
+                });
+         
+
+               imgElements.forEach(function(img){
+                if(currentTime >= img.start && currentTime < img.end){
+                    img.div.style.display='block';
+                }else{
+                    img.div.style.display='none';
+                }
+            });
+        }
+
+           
+            video.addEventListener('timeupdate', function() {
+                updateTextVisibility(video.currentTime);
+            });
+
+            
+            video.addEventListener('seeked', function() {
+                updateTextVisibility(video.currentTime);
+            });
+
+            
+            displayText('Hello,{{name}}',1,15,{x: 9.5,y: 2},'1.1em','white','left','500','70%');
+            displayText('₹{{formatted_total_premium}}', 57, 81, { x: 12, y: 27 },  '1.1em', 'black', '', '700', '80%');
+            displayText('₹{{foramtted_benefit_premium}}', 59, 81, { x: 64.5, y: 27 },  '1.1em', 'black', '', '700', '80%');
+            displayText('Choose income options tailored to your needs', 18, 39, { x: 20, y: 23 },  '1.0em', '#000000', 'left', '', '70%');
+            displayText('Receive income as early as the end of the 1st policy year or choose to defer', 22, 39, { x: 20, y: 35 },  '1.0em', '#000000', 'left', '', '70%');
+            displayText('Get Life Cover of ₹5,00,000', 26, 39, { x: 20, y: 48 },  '1.0em', '#000000', 'left', '', '70%');
+            displayText('Guaranteed Maturity Benefit of ₹3,38,390', 30, 39, { x: 20, y: 59 }, '1.0em', '#000000', 'left', '', '70%');
+            displayText('Enjoy tax benefits on premiums paid and benefits received as per prevailing tax laws', 34, 39, { x: 20, y: 70},  '1.0em', '#000000', 'left', '', '70%');
+            displayText('Annual Permium of ₹50,000',65,81,{x:14,y:54},'0.8em','#023a7d','center','700','30%');
+            displayText('Maturity Benefit of ₹3,38,390',68,81,{x:57,y:50},'0.8em','#023a7d','center','700','30%');
+            displayText('Guaranteed Income Including Loyality Income of upto ₹14,000',67,81,{x:35,y:80},'0.8em','#023a7d','left','700','50%');
+            displayText('Age',68,81,{x:8,y:63},'0.7em','black','left','bold','30%');
+            displayText('{{age}}',68,81,{x:9,y:65.5},'0.7em','black','left','700','30%');
+            displayText('Age',68,81,{x:19,y:63},'0.7em','black','left','bold','30%');
+             displayText('{{ageOne}}',68,81,{x:20,y:65.5},'0.7em','black','left','700','30%');
+            displayText('Age',68,81,{x:83,y:63},'0.7em','black','left','bold','30%');
+            displayText('{{ageTwo}}',68,81,{x:84,y:65.5},'0.7em','black','left','700','30%');
+            displayText('Age',68,81,{x:44,y:63},'0.7em','black','left','bold','30%');
+            displayText('{{ageThree}}',68,81,{x:45,y:65.5},'0.7em','black','left','700','30%');
+
+            displayText('Plan Name',83,90,{x: 16,y: 17.5},'0.8em','black','left','500','70%');
+            displayText('SUD Life Century Income',83,90,{x: 50,y: 18},'0.77em','black','left','700','70%');
+            displayText('UIN',83,90,{x: 16,y: 24},'0.8em','black','left','500','70%');
+            displayText('142N100V02',83,90,{x:50,y:24},'0.8em','black','left','700','70%');
+            displayText('Policy Terms (in Years)',83,90,{x: 16,y: 29.5},'0.8em','black','left','500','30%');
+            displayText('Permium Payment Terms(in Years)',83,90,{x: 16,y: 36},'0.8em','black','left','549','36%');
+            displayText('Permium Payment Frequency',83,90,{x: 16,y: 43},'0.8em','black','left','500','35%');
+            displayText('{{term}}',83,90,{x:50,y:31},'0.8em','black','left','700','70%');
+            displayText('{{payTerm}}',83,90,{x:50,y:37},'0.8em','black','left','700','70%')
+            
+            displayText('{{frequency}}',83,90,{x:50,y:44},'0.8em','black','left','700','70%');
+            displayText('Sum Assured',83,90,{x: 16,y: 50.5},'0.8em','black','left','500','70%');
+            displayText('₹5,00,000',83,90,{x:50,y:50.5},'0.8em','black','left','700','70%');
+            displayText('Plan Option',83,90,{x: 16,y: 57},'0.8em','black','left','500','70%');
+            displayText('Immediate Income',83,90,{x:50,y:57},'0.8em','black','left','700','70%');
+            displayText('Permium',84,90,{x: 16,y: 67},'0.8em','#023a7d','left','bold','70%');
+            displayText('First Year',84,90,{x: 47,y: 67},'0.8em','#023a7d','left','bold','70%');
+            displayText('Second Year Onwards',84,90,{x: 66,y: 66},'0.8em','#023a7d','left','bold','30%');
+            displayText('₹50,000',84,90,{x:47,y:73},'0.8em','black','left','700','70%');
+            displayText('₹6,000',84,90,{x:47,y:80},'0.8em','black','left','700','70%');
+            displayText('₹56,000',84,90,{x:47,y:87},'0.8em','black','left','700','70%');
+            displayText('₹50,000',84,90,{x:66,y:73},'0.8em','black','left','700','70%');
+            displayText('₹8,000',84,90,{x:66,y:80},'0.8em','black','left','700','70%');
+            displayText('₹58,000',84,90,{x:66,y:87},'0.8em','black','left','700','70%');
+
+
+            displayText('Base Annual Permium',84,90,{x: 16,y: 72},'0.8em','black','left','500','30%');
+            displayText('GST incl Cess,if any',84,90,{x: 16,y: 79},'0.8em','black','left','540','20%');
+            displayText('Total Annual Permium with GST',84,90,{x: 16,y: 85.5},'0.8em','black','left','500','30%');
+            displayText('Presented By Hanuma',91,98,{x:20,y:57},'1.5em', '#023a7d','left','700','70%');
+            displayImage('https://t3-video-audio-mapping.s3.eu-north-1.amazonaws.com/sharpsell.image.png',91,98,{x:25,y:20},'200px','200px');
+
+
+           
+            let audioUrl = audioScore.src;
+            if (audioUrl) {
+                console.log("Loaded Audio URL:", audioUrl);
+                audio.load();
+
+                document.addEventListener('click',function(){
+                    video.muted=false;
+                    audio.play();
+            },{once:true});
+
+                video.addEventListener('play', function() {
+                    audio.currentTime = video.currentTime;
+                    audio.play();
+                });
+
+                video.addEventListener('pause', function() {
+                    audio.pause();
+                });
+
+                audio.addEventListener('pause', function() {
+                    video.pause();
+                });
+
+                video.addEventListener('seeked', function() {
+                    audio.currentTime = video.currentTime;
+                });
+
+                video.addEventListener('volumechange', function() {
+                    audio.volume = video.volume;
+                    audio.muted = video.muted;
+                });
+            }
+        });
+    </script>
+</body>
+</html>
