@@ -9,8 +9,8 @@ from datetime import datetime
 
 
 # AWS and Google API credentials
-AWS_ACCESS_KEY_ID = 'AKIA3ISBVN2XTJEHA5HW'
-AWS_SECRET_ACCESS_KEY = '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'
+AWS_ACCESS_KEY_ID = 'AKIARKXPVNN3LVVXP35N'
+AWS_SECRET_ACCESS_KEY = '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'
 GOOGLE_API_KEY = 'AIzaSyDRhOeB7INqWcV0yiNpw6pNmUqdtEE8JAI'
 
 def parse_regular_fields(data):
@@ -149,7 +149,7 @@ def convert_to_words(num):
 
 
 
-def save_base64_as_mp3_to_s3(base64_string, object_key, aws_access_key_id, aws_secret_access_key, region_name="eu-north-1", bucket_name="t3-video-audio-mapping"):
+def save_base64_as_mp3_to_s3(base64_string, object_key, aws_access_key_id, aws_secret_access_key, region_name="eu-north-1", bucket_name="emi-calculator-s1"):
     mp3_data = base64.b64decode(base64_string)
     s3 = boto3.client(
         "s3",
@@ -285,7 +285,7 @@ def process_calculation_logic(form_data, env_variables, user_meta, **kwargs):
 
     audio_text = get_audio_text(name,total_premium ,benefit_premium,total_premium_words,benefit_premium_words,special_one,special_two)
     audio_url = text_to_speech(audio_text, GOOGLE_API_KEY, AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY)
-    s3_audio_url=f"https://t3-video-audio-mapping.s3.eu-north-1.amazonaws.com/{audio_url}"
+    s3_audio_url=f"https://emi-calculator-s1.s3.eu-north-1.amazonaws.com/{audio_url}"
     return {
         "audioUrl":s3_audio_url,
         "name":name,
